@@ -6,7 +6,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 
-MODEL_PATH = "face_landmarker.task"
+MODEL_PATH = "./models/face_landmarker.task"
 
 
 def draw_landmarks_on_frame(frame, detection_result):
