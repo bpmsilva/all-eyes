@@ -4,3 +4,4 @@ torch
 torchvision
 face_detection@git+https://github.com/elliottzheng/face-detection
 scipy
+scikit-learn
