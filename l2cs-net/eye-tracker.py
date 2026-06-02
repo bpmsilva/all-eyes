@@ -20,6 +20,14 @@ def parse_args():
     parser.add_argument("--device", default="cpu", type=str)
     parser.add_argument("--cam", dest="cam_id", default=0, type=int)
     parser.add_argument("--arch", default="ResNet50", type=str)
+
+    # Nova flag: só grava se o usuário passar --gravar
+    parser.add_argument(
+        "--gravar",
+        action="store_true",
+        help="Grava o vídeo da câmera em arquivo MP4."
+    )
+
     return parser.parse_args()
 
 def get_yaw_pitch(results):
@@ -34,10 +42,12 @@ def get_yaw_pitch(results):
     return float(yaw), float(pitch)
 
 class GazeApp:
-    def __init__(self, root, gaze_pipeline, cap):
+    def __init__(self, root, gaze_pipeline, cap, gravar=False):
         self.root = root
         self.gaze_pipeline = gaze_pipeline
         self.cap = cap
+        self.gravar = gravar
+        self.out = None
 
         self.screen_w = root.winfo_screenwidth()
         self.screen_h = root.winfo_screenheight()
@@ -60,13 +70,17 @@ class GazeApp:
 
         h, w, _ = frame.shape
 
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        self.out = cv2.VideoWriter(
-            "gravacao_l2cs_calibrado.mp4",
-            fourcc,
-            20.0,
-            (w, h)
-        )
+        if self.gravar:
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            self.out = cv2.VideoWriter(
+                "gravacao_l2cs_calibrado.mp4",
+                fourcc,
+                20.0,
+                (w, h)
+            )
+            print("Gravando em: gravacao_l2cs_calibrado.mp4")
+        else:
+            print("Modo sem gravação. Use --gravar para salvar o vídeo.")
 
         margin = 40
 
@@ -104,7 +118,6 @@ class GazeApp:
         self.last_pitch = None
         self.running = True
 
-        print("Gravando em: gravacao_l2cs_calibrado.mp4")
         self.update()
 
     def draw_grid(self):
@@ -244,7 +257,8 @@ class GazeApp:
                 2
             )
 
-            self.out.write(camera_frame)
+            if self.gravar and self.out is not None:
+                self.out.write(camera_frame)
 
             cv2.imshow("Camera L2CS", camera_frame)
 
@@ -266,7 +280,11 @@ class GazeApp:
 
     def close(self, event=None):
         self.running = False
-        self.out.release()
+
+        # Só libera o VideoWriter se ele tiver sido criado
+        if self.out is not None:
+            self.out.release()
+
         self.cap.release()
         cv2.destroyAllWindows()
         self.root.destroy()
@@ -287,5 +305,5 @@ if __name__ == "__main__":
         raise IOError("Cannot open webcam")
 
     root = tk.Tk()
-    app = GazeApp(root, gaze_pipeline, cap)
+    app = GazeApp(root, gaze_pipeline, cap, gravar=args.gravar)
     root.mainloop()

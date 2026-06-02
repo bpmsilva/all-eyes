@@ -43,6 +43,9 @@ Para executar os scripts, use os seguintes comandos no terminal:
     ```
 - Para usar o L2CS:
     ```bash
-    python3 eye-tracker.py # Você precisa estar na pasta l2cs para acessar o arquivo eye-tracker.py
+    python3 eye-tracker.py # Você precisa estar na pasta l2cs-net para acessar o arquivo eye-tracker.py
     ```
-
+Neste último caso, você pode adicionar a opção `--gravar` para salvar a gravação do vídeo:
+    ```bash
+    python3 eye-tracker.py --gravar
+    ```
