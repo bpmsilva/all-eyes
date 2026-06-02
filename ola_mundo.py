@@ -20,6 +20,9 @@ while True:
         print("Erro: não foi possível capturar o vídeo.")
         break
 
+    # Espelha a imagem: fica parecendo um espelho, o que é mais intuitivo para o usuário
+    frame = cv2.flip(frame, 1)
+
     # Mostra o vídeo em uma janela
     cv2.imshow("Webcam do notebook", frame)
 
